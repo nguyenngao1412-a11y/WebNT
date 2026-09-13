@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dễ Hưnnn</title>
+
+  <link rel="icon" type="image/x-icon" href="favicon.png"> <link rel="apple-touch-icon" href="icon.png"> <link rel="manifest" href="manifest.json"> <style>
+    /* Reset CSS cơ bản để xóa lề mặc định của trình duyệt */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* Dấu thanh cuộn trang web */
+      font-family: Arial, sans-serif;
+    }
+
+    /* 1. LỚP NỀN DƯỚI (Nền thứ 2 - Lộ ra sau khi trả lời đúng) */
+    .background-bottom {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('anh3.gif'); /* Bạn có thể thay bằng background: linear-gradient(135deg, #2b5876, #4e4376); */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 2rem;
+      z-index: 1; /* Nằm dưới lớp nền thứ nhất */
+      overflow: hidden; /* Cắt bớt phần thừa nếu video vượt khung màn hình */
+    }
+    .bg-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Giúp video tràn đều khung hình không bị méo */
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;       /* Đặt video nằm ở tầng dưới cùng của thẻ cha */
+    }
+
+    /* 2. LỚP NỀN TRÊN (Nền thứ 1 - Mở ra đầu tiên, ví dụ: cánh đồng hoa) */
+    .layer-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /*background-image: url('anh1.png'); /* Thay bằng background: linear-gradient(to bottom, #a8ff78, #78ffd6); */ 
+      z-index: 2; /* Nằm đè lên lớp nền thứ 2 */
+      transition: transform 1.5s ease-in-out; /* Hiệu ứng trượt kéo nền lên mượt mà */
+      overflow: hidden; /* Cắt bớt phần thừa nếu video vượt khung màn hình */
+
+    }
+
+    /* 3. VẬT THỂ (Con ong bay vào) */
+    .bee {
+      position: absolute;
+      width: 80px;
+      height: 80px; 
+      background: url('anh2.png') no-repeat center/contain; /* Thay bằng ảnh con ong: background: #ffd700; */
+      border-radius: 50%;
+      top: -100px; /* Bắt đầu ở bên ngoài mép trên màn hình */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3; /* Nằm trên cả 2 nền */
+      transition: top 2s ease-out; /* Thời gian bay từ trên xuống giữa màn hình */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+    }
+
+    /* Hiệu ứng animation nhấp nhô (dừng tại chỗ nhô lên nhấp xuống) */
+    @keyframes bobbing {
+      0%, 100% { transform: translate(-50%, 0px); }
+      50% { transform: translate(-50%, -15px); } /* Bay lên 15px rồi hạ xuống */
+    }
+
+    /* Class kích hoạt hiệu ứng nhấp nhô */
+    .bee.floating {
+      animation: bobbing 2s infinite ease-in-out;
+    }
+
+    /* 4. KHUNG THOẠI TRUYỆN TRANH (Quả bóng thoại) */
+    .speech-bubble {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%) scale(0); /* Ban đầu thu nhỏ về 0 (ẩn đi) */
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px;
+      width: 280px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 4;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy khung thoại */
+    }
+
+    /* Mũi nhọn bên dưới của bong bóng thoại */
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 15px 15px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+    }
+
+    /* Class hiện khung thoại lên */
+    .speech-bubble.show {
+      transform: translateX(-50%) scale(1);
+    }
+
+    .speech-bubble input {
+      margin-top: 10px;
+      padding: 8px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .speech-bubble button {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: #ffb703;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* 5. HIỆU ỨNG THOÁT RA (Bay vút lên kéo theo nền 1 biến mất) */
+    .exit-up {
+      transform: translateY(-120vh) !important; /* Dịch chuyển vật thể/nền vút khỏi mép trên màn hình */
+      transition: transform 1.5s ease-in-out !important;
+    }
+
+    /* 6. NÚT BẬT/TẮT NHẠC NỀN */
+    .music-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 10; /* Luôn nổi lên trên cùng */
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵</button>
+
+  <audio id="bgMusic" loop>
+    <source src="audio.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="background-bottom">
+            <!-- 1. Thêm video nền ở đây -->
+    <video autoplay loop muted playsinline class="bg-video">
+        <source src="anh3.mp4" type="video/mp4">
+    </video>
+    <h1 style="position: relative; z-index: 2;">Chòng iuuu vợ nhèooooooo 😍❤️</h1>
+  </div>
+
+  <div class="layer-top" id="layerTop">
+    <video autoplay loop muted playsinline class="bg-video">
+        <source src="video1.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="bee" id="bee"></div>
+
+  <div class="speech-bubble" id="bubble">
+    <p>Ngày tháng năm sinh của bạn là?</p>
+    <input type="text" id="answerInput" placeholder="(ví dụ: 17/03/2011) Nhập:17032011 ">
+    <br>
+    <button onclick="checkAnswer()">check 😏</button>
+  </div>
+
+  <script>
+    // BIẾN CẤU HÌNH: Bạn có thể đổi đáp án đúng tại đây
+    const CORRECT_ANSWER = "14122004";
+
+    // Khai báo các đối tượng trong giao diện (tương tự con trỏ/biến cấu trúc trong C++)
+    const bee = document.getElementById('bee');
+    const bubble = document.getElementById('bubble');
+    const layerTop = document.getElementById('layerTop');
+    const answerInput = document.getElementById('answerInput');
+    const bgMusic = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicBtn');
+
+    let isPlaying = false;
+
+    // 1. Tự động phát nhạc khi người dùng nhấp vào trang web lần đầu (Quy định bảo mật của trình duyệt cấm tự động bật tiếng)
+    document.addEventListener('click', () => {
+      if (!isPlaying) {
+        bgMusic.play().then(() => {
+          isPlaying = true;
+          musicBtn.textContent = '🎵';
+        }).catch(() => {});
+      }
+    }, { once: true });
+
+    // 2. Hàm xử lý Bật/Tắt nhạc nền khi bấm vào nút góc màn hình
+    function toggleMusic() {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicBtn.textContent = '🔇';
+        isPlaying = false;
+      } else {
+        bgMusic.play();
+        musicBtn.textContent = '🎵';
+        isPlaying = true;
+      }
+    }
+
+    // 3. Tiến trình chuyển động ban đầu khi tải xong web
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        // Cho con ong bay từ trên xuống giữa màn hình (45%)
+        bee.style.top = '45%';
+        
+        // Sau khi hoàn thành bay xuống (2 giây), bật hiệu ứng nhấp nhô và hiện khung thoại
+        setTimeout(() => {
+          bee.classList.add('floating');
+          bubble.classList.add('show');
+        }, 2000);
+      }, 500);
+    });
+
+    // 4. Hàm kiểm tra câu trả lời của người dùng
+    function checkAnswer() {
+      // .trim() giúp xóa khoảng trắng dư thừa do nhập tay
+      if (answerInput.value.trim() === CORRECT_ANSWER) {
+        // Nếu đúng: Ẩn khung thoại và ngưng nhấp nhô
+        bubble.classList.remove('show');
+        bee.classList.remove('floating');
+
+        // Cho ong và nền thứ nhất kéo vút lên trên biến mất
+        setTimeout(() => {
+          bee.classList.add('exit-up');
+          layerTop.classList.add('exit-up');
+        }, 300);
+      } else {
+        // Nếu sai: Báo lỗi
+        alert("Sai rồi! Hãy thử lại.");
+      }
+    }
+  </script>
+</body>
+</html>
